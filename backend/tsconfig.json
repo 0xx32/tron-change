@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "strict": true,
+        "types": ["node"],
+        "jsx": "react-jsx",
+        "jsxImportSource": "hono/jsx",
+        "baseUrl": "./src",
+        "paths": {
+            "@/*": ["src/*"],
+            "types": ["src/@types/*"],
+            "routes": ["src/routes/*"],
+            "payments-modules": ["src/payments-modules/*"],
+            "tron-web": ["src/tron-web/*"]
+        }
+    }
+}
