@@ -1,12 +1,17 @@
-import './App.css';
+import { FormSwap } from 'components/FormSwap';
+import { Layout } from 'components/layout';
 
-const App = () => {
-  return (
-    <div className="content">
-      <h1>Rsbuild with React</h1>
-      <p>Start building amazing things with Rsbuild.</p>
-    </div>
-  );
+export const App = () => {
+    return (
+        <div className="content  h-screen">
+            <Layout>
+                <div className="pt-10">
+                    <h1 className="text-center mb-10 text-3xl">Tron change</h1>
+                    <div className="max-w-[600px] mx-auto">
+                        <FormSwap />
+                    </div>
+                </div>
+            </Layout>
+        </div>
+    );
 };
-
-export default App;
