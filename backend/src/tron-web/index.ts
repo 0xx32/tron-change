@@ -9,4 +9,4 @@ const tronWeb = new TronWeb({
     privateKey: process.env.PRIVATE_KEY!,
 });
 
-export default tronWeb;
+export { tronWeb };

@@ -1,41 +1,69 @@
 import { Hono } from 'hono';
-import tronWeb from '../tron-web';
+import { vValidator } from '@hono/valibot-validator';
 
-import crypto from 'crypto';
-import { Buffer } from 'node:buffer';
+import { prisma } from 'database/db';
 import { addressValidation } from 'tron-web/helpers/addressValidation';
+import { createOrderShema } from 'valibot/order.shemas';
 
-// const toHash_md5 = (data: string) => crypto.createHash('md5').update(data).digest('hex');
-// const buf1 = Buffer.from(toHash_md5('wadawd'), 'base64').toString('base64');
-// console.log(toHash_md5(buf1));
+import CryptoCloudSDK from 'payments-modules/crypto-cloud/crypto-cloud-sdk';
+import { CallbackResponse } from 'payments-modules/crypto-cloud/crypto-cloud.types';
+
+const CRYPTOMUS_IP = '91.227.144.54';
 
 const orders = new Hono();
 
-orders.post('/create', async (ctx) => {
-    const { amount, address } = await ctx.req.json<CreateTransactionDto>();
+const CryptoCloud = new CryptoCloudSDK(process.env.CRYPTO_CLOUD_API_KEY!);
 
-    if (!amount) {
+orders.post('/', vValidator('json', createOrderShema), async (ctx) => {
+    const orderDto = ctx.req.valid('json');
+
+    if (!orderDto.amount) {
         ctx.status(400);
         return ctx.json({ success: false, message: 'Не указанно количество trx' });
     }
-    if (!address) {
+    if (!orderDto.address) {
         ctx.status(400);
-        return ctx.json({ success: false, message: 'Не указанн адрес' });
+        return ctx.json({ success: false, message: 'Не указан адрес' });
     }
-    if (!addressValidation(address)) {
+    if (!addressValidation(orderDto.address)) {
         ctx.status(400);
         return ctx.json({ success: false, message: 'Некорректный адрес' });
     }
 
-    // const responseTransaction = await tronWeb.trx.sendTransaction(address, amount);
+    const order = await prisma.order.create({
+        data: {
+            amount: orderDto.amount,
+            address: orderDto.address,
+            currency: orderDto.currency,
+            network: orderDto.network,
+            status: 'creating',
+        },
+    });
 
-    // Create payment link
+    const payment = await CryptoCloud.createInvoice({
+        amount: order.amount,
+        currency: order.currency,
+        order_id: order.id.toString(),
+        shop_id: process.env.CRYPTO_CLOUD_SHOP_ID!,
+    });
 
-    const paymentUrl = 'https://tronscan.org';
+    const paymentUrl = payment.result.link;
 
-    ctx.status(401);
+    return ctx.json({ success: true, message: 'Заказ успешно создан', paymentUrl: paymentUrl });
+});
 
-    return ctx.json({ success: true, message: 'Transaction created successfully', paymentUrl });
+orders.post('/payment-callback', async (ctx) => {
+    const paymentResponse = await ctx.req.json<CallbackResponse>();
+    console.log(paymentResponse);
+
+    // const paymentResponse = await ctx.req.json<OrderInfoWebhook>();
+
+    // const payment = await prisma.payment.findUnique({ where: { uuid: paymentResponse.uuid } });
+    // const order = await prisma.order.findUnique({ where: { id: payment?.orderId } });
+
+    // if (payment?.isFinal && order) {
+    //     tronWeb.trx.sendTransaction(order?.address, +order.amount);
+    // }
 });
 
 export { orders };

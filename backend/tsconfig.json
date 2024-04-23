@@ -10,7 +10,7 @@
         "baseUrl": "./src",
         "paths": {
             "@/*": ["src/*"],
-            "types": ["src/@types/*"],
+            "@types": ["src/@types/*"],
             "routes": ["src/routes/*"],
             "payments-modules": ["src/payments-modules/*"],
             "tron-web": ["src/tron-web/*"]

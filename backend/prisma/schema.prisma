@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Order {
+  id       Int      @id @default(autoincrement())
+  amount   Int
+  currency String
+  network  String
+  address  String
+  status   String
+  payment  Payment?
+}
+
+model Payment {
+  id           Int    @id @default(autoincrement())
+  uuid         String @unique
+  invoice_id   String
+  amount       Int
+  fee          Int
+  status       String
+  order        Order  @relation(fields: [orderId], references: [id])
+  orderId      Int    @unique
+  payment_link String
+  created      String
+}
+
+// model CryptomusPayment {
+//   id                Int     @id @default(autoincrement())
+//   uuid              String  @unique
+//   amount            String
+//   cryptomus_orderId String  @unique
+//   isFinal           Boolean
+//   status            String
+//   order             Order   @relation(fields: [orderId], references: [id])
+//   orderId           Int     @unique
+//   sign              String
+// }

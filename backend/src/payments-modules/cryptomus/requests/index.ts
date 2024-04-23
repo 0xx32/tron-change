@@ -1,8 +1,17 @@
-import type { Order } from 'payments-modules/cryptomus/types';
+import { cryptomusApi } from 'axios/cryptomus.instance';
+import type { PaymentResponse } from 'payments-modules/cryptomus/types';
 
-export interface ResponseOrder {
-    state: number;
-    result: Order;
+interface SendPaymentParams extends CreateOrderDto {
+    order_id: string;
+    url_callback: string;
 }
 
-export const payment = async (amount: number, currency: string, order_id: string) => {};
+export type PostAuthOptRequestConfig = RequestConfig<SendPaymentParams>;
+
+export const sendPayment = async ({ params, config }: PostAuthOptRequestConfig) => {
+    const { data } = await cryptomusApi.post<PaymentResponse>('/payment', params, config);
+
+    return data;
+};
+
+
