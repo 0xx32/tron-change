@@ -67,8 +67,9 @@ interface Project {
 }
 
 export interface CallbackResponse {
-    userId: number;
-    id: number;
-    title: string;
-    completed: boolean;
+    status: string;
+    invoice_id: string;
+    amount_crypto: number;
+    currency: string;
 }
+

@@ -40,30 +40,29 @@ orders.post('/', vValidator('json', createOrderShema), async (ctx) => {
         },
     });
 
-    const payment = await CryptoCloud.createInvoice({
+    const invoice = await CryptoCloud.createInvoice({
         amount: order.amount,
         currency: order.currency,
         order_id: order.id.toString(),
         shop_id: process.env.CRYPTO_CLOUD_SHOP_ID!,
     });
 
-    const paymentUrl = payment.result.link;
+    await prisma.payment.create({
+        data: {
+            uuid: invoice.result.uuid,
+            status: invoice.result.status,
+            invoice_id: invoice.result.invoice_id,
+            amount: invoice.result.amount,
+            created: invoice.result.created,
+            fee: invoice.result.fee,
+            payment_link: invoice.result.link,
+            orderId: order.id,
+        },
+    });
+
+    const paymentUrl = invoice.result.link;
 
     return ctx.json({ success: true, message: 'Заказ успешно создан', paymentUrl: paymentUrl });
-});
-
-orders.post('/payment-callback', async (ctx) => {
-    const paymentResponse = await ctx.req.json<CallbackResponse>();
-    console.log(paymentResponse);
-
-    // const paymentResponse = await ctx.req.json<OrderInfoWebhook>();
-
-    // const payment = await prisma.payment.findUnique({ where: { uuid: paymentResponse.uuid } });
-    // const order = await prisma.order.findUnique({ where: { id: payment?.orderId } });
-
-    // if (payment?.isFinal && order) {
-    //     tronWeb.trx.sendTransaction(order?.address, +order.amount);
-    // }
 });
 
 export { orders };
