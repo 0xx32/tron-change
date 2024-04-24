@@ -14,6 +14,7 @@ interface CreateOrderDto {
     address: string;
     currency: string;
     network: string;
+    paymentAmount: number;
 }
 
 interface CreateOrderResponse extends BaseResponse {

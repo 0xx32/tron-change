@@ -32,7 +32,7 @@ orders.post('/', vValidator('json', createOrderShema), async (ctx) => {
 
     const order = await prisma.order.create({
         data: {
-            amount: orderDto.amount,
+            amount: orderDto.paymentAmount,
             address: orderDto.address,
             currency: orderDto.currency,
             network: orderDto.network,
@@ -42,23 +42,23 @@ orders.post('/', vValidator('json', createOrderShema), async (ctx) => {
 
     const invoice = await CryptoCloud.createInvoice({
         amount: order.amount,
-        currency: order.currency,
+        currency: 'USD',
         order_id: order.id.toString(),
         shop_id: process.env.CRYPTO_CLOUD_SHOP_ID!,
     });
-
-    await prisma.payment.create({
-        data: {
-            uuid: invoice.result.uuid,
-            status: invoice.result.status,
-            invoice_id: invoice.result.invoice_id,
-            amount: invoice.result.amount,
-            created: invoice.result.created,
-            fee: invoice.result.fee,
-            payment_link: invoice.result.link,
-            orderId: order.id,
-        },
-    });
+    console.log(invoice);
+    // await prisma.payment.create({
+    //     data: {
+    //         uuid: invoice.result.uuid,
+    //         status: invoice.result.status,
+    //         invoice_id: invoice.result.invoice_id,
+    //         amount: invoice.result.amount,
+    //         created: invoice.result.created,
+    //         fee: invoice.result.fee,
+    //         payment_link: invoice.result.link,
+    //         orderId: order.id,
+    //     },
+    // });
 
     const paymentUrl = invoice.result.link;
 

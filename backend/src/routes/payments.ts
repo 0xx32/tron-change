@@ -2,30 +2,40 @@ import { prisma } from 'database/db';
 import { Hono } from 'hono';
 import { CallbackResponse } from 'payments-modules/crypto-cloud/crypto-cloud.types';
 import { tronWeb } from 'tron-web/index';
+import * as jwt from 'jsonwebtoken';
 
-const payments = new Hono();
+export const payments = new Hono();
 
 payments.post('/callback', async (ctx) => {
-    const body = await ctx.req.parseBody();
-    const res = body as unknown as CallbackResponse;
+    try {
+        const body = await ctx.req.parseBody();
+        const { status, invoice_id, token } = body;
 
-    if (res.status !== 'success') return;
+        if (!status || !token || status !== 'success' || !invoice_id) return ctx.json({ success: false });
 
-    const payment = await prisma.payment.update({
-        where: { uuid: res.invoice_id },
-        data: {
-            status: res.status,
-        },
-    });
-    const order = await prisma.order.update({
-        where: { id: payment.orderId },
-        data: {
-            status: res.status,
-        },
-    });
+        const tokenVerify = jwt.decode(token as string) as {
+            id: string;
+        };
 
-    console.log('address', order.address);
-    console.log('amount trx', order.amount);
+        if (tokenVerify && tokenVerify.id !== invoice_id) return ctx.json({ success: false });
 
-    // tronWeb.trx.sendTransaction(order?.address, +order.amount);
+        const payment = await prisma.payment.update({
+            where: { uuid: invoice_id as string },
+            data: {
+                status: status as string,
+            },
+        });
+        await prisma.order.update({
+            where: { id: payment.orderId },
+            data: {
+                status: status as string,
+            },
+        });
+
+        // tronWeb.trx.sendTransaction(order?.address, +order.amount);
+
+        console.log('Успех');
+
+        return ctx.json({ success: true });
+    } catch (error) {}
 });

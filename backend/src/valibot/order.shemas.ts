@@ -8,4 +8,5 @@ export const createOrderShema = v.object({
     address: v.string(),
     currency: v.string(),
     network: v.string(),
+    paymentAmount: v.number(),
 });

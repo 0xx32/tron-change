@@ -8,7 +8,7 @@ import { valibotResolver } from '@hookform/resolvers/valibot';
 import { useMutation } from '@tanstack/react-query';
 import { createOrder } from '@/api/requests/orders';
 
-export const useFormSwap = () => {
+export const useFormSwap = ({ paymentAmount }: { paymentAmount: number }) => {
     const [paymentModalShow, setPaymentModalShow] = useState(false);
 
     const [paymentLink, setPaymentLink] = useState('');
@@ -38,6 +38,7 @@ export const useFormSwap = () => {
         await createOrderMutattion.mutateAsync({
             address: value.address,
             amount: +value['amount-trx'],
+            paymentAmount: paymentAmount,
             currency: 'TRX',
             network: 'tron',
         });

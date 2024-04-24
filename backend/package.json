@@ -10,9 +10,11 @@
     "axios": "^1.6.8",
     "dotenv": "^16.4.5",
     "hono": "^4.2.5",
+    "jsonwebtoken": "^9.0.2",
     "valibot": "^0.30.0"
   },
   "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.6",
     "@types/node": "^20.11.17",
     "prisma": "^5.12.1",
     "tsx": "^4.7.1"
