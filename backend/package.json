@@ -1,22 +1,25 @@
 {
-  "scripts": {
-    "dev": "tsx watch src/index.ts"
-  },
-  "dependencies": {
-    "@hono/node-server": "^1.11.0",
-    "@hono/valibot-validator": "^0.2.3",
-    "@prisma/client": "5.12.1",
-    "@sterliakov/tstron": "0.1.0-alpha.2",
-    "axios": "^1.6.8",
-    "dotenv": "^16.4.5",
-    "hono": "^4.2.5",
-    "jsonwebtoken": "^9.0.2",
-    "valibot": "^0.30.0"
-  },
-  "devDependencies": {
-    "@types/jsonwebtoken": "^9.0.6",
-    "@types/node": "^20.11.17",
-    "prisma": "^5.12.1",
-    "tsx": "^4.7.1"
-  }
+    "scripts": {
+        "dev": "tsx watch src/index.ts"
+    },
+    "dependencies": {
+        "@crypto-pay/sdk": "^0.1.1",
+        "@hono/node-server": "^1.11.0",
+        "@hono/valibot-validator": "^0.2.3",
+        "@prisma/client": "5.13.0",
+        "@sterliakov/tstron": "0.1.0-alpha.2",
+        "axios": "^1.6.8",
+        "dotenv": "^16.4.5",
+        "got": "11.8.3",
+        "hono": "^4.2.5",
+        "jsonwebtoken": "^9.0.2",
+        "valibot": "^0.30.0"
+    },
+    "devDependencies": {
+        "@types/got": "^9.6.12",
+        "@types/jsonwebtoken": "^9.0.6",
+        "@types/node": "^20.11.17",
+        "prisma": "^5.13.0",
+        "tsx": "^4.7.1"
+    }
 }

@@ -14,7 +14,6 @@ CREATE TABLE "Payment" (
     "uuid" TEXT NOT NULL,
     "invoice_id" TEXT NOT NULL,
     "amount" INTEGER NOT NULL,
-    "fee" INTEGER NOT NULL,
     "status" TEXT NOT NULL,
     "orderId" INTEGER NOT NULL,
     "payment_link" TEXT NOT NULL,

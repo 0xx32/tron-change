@@ -1,6 +1,6 @@
 import { CreateInvoiceResponse, InvoiceData } from './crypto-cloud.types';
 
-class CryptoCloudSDK {
+class CryptoCloud {
     apiKey: string;
     baseUrl: string;
     constructor(apiKey: string) {
@@ -9,8 +9,6 @@ class CryptoCloudSDK {
     }
 
     async sendRequest<Payload>(endpoint: string, method = 'POST', payload: Payload | null = null) {
-
-
         const headers = {
             Authorization: `Token ${this.apiKey}`,
             'Content-Type': 'application/json',
@@ -59,4 +57,4 @@ class CryptoCloudSDK {
     }
 }
 
-export default CryptoCloudSDK;
+export { CryptoCloud };

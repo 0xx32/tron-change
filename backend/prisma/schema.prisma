@@ -22,7 +22,6 @@ model Payment {
   uuid         String @unique
   invoice_id   String
   amount       Int
-  fee          Int
   status       String
   order        Order  @relation(fields: [orderId], references: [id])
   orderId      Int    @unique

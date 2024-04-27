@@ -5,17 +5,14 @@ import { prisma } from 'database/db';
 import { addressValidation } from 'tron-web/helpers/addressValidation';
 import { createOrderShema } from 'valibot/order.shemas';
 
-import CryptoCloudSDK from 'payments-modules/crypto-cloud/crypto-cloud-sdk';
-import { CallbackResponse } from 'payments-modules/crypto-cloud/crypto-cloud.types';
-
-const CRYPTOMUS_IP = '91.227.144.54';
+import { PAYMENT_METHOD_LIST } from 'constants/payments';
+import { createInvoiceCryptoBot, createInvoiceCryptoCloud } from 'payments-modules/utils/createInvoice';
 
 const orders = new Hono();
 
-const CryptoCloud = new CryptoCloudSDK(process.env.CRYPTO_CLOUD_API_KEY!);
-
 orders.post('/', vValidator('json', createOrderShema), async (ctx) => {
     const orderDto = ctx.req.valid('json');
+    const methodPayment = 'crypto-bot';
 
     if (!orderDto.amount) {
         ctx.status(400);
@@ -27,7 +24,7 @@ orders.post('/', vValidator('json', createOrderShema), async (ctx) => {
     }
     if (!addressValidation(orderDto.address)) {
         ctx.status(400);
-        return ctx.json({ success: false, message: 'Некорректный адрес' });
+        return ctx.json({ success: false, message: 'Некорректный адрес кошелька' });
     }
 
     const order = await prisma.order.create({
@@ -40,29 +37,27 @@ orders.post('/', vValidator('json', createOrderShema), async (ctx) => {
         },
     });
 
-    const invoice = await CryptoCloud.createInvoice({
-        amount: order.amount,
-        currency: 'USD',
-        order_id: order.id.toString(),
-        shop_id: process.env.CRYPTO_CLOUD_SHOP_ID!,
-    });
-    console.log(invoice);
-    // await prisma.payment.create({
-    //     data: {
-    //         uuid: invoice.result.uuid,
-    //         status: invoice.result.status,
-    //         invoice_id: invoice.result.invoice_id,
-    //         amount: invoice.result.amount,
-    //         created: invoice.result.created,
-    //         fee: invoice.result.fee,
-    //         payment_link: invoice.result.link,
-    //         orderId: order.id,
-    //     },
-    // });
+    if (PAYMENT_METHOD_LIST.cryptoCloud === methodPayment) {
+        const invoice = await createInvoiceCryptoCloud({
+            amount: orderDto.amount,
+            currency: orderDto.currency,
+            orderId: order.id,
+            methodPayment,
+        });
 
-    const paymentUrl = invoice.result.link;
+        return ctx.json({ success: true, message: 'Заказ успешно создан', paymentUrl: invoice.result.link });
+    }
 
-    return ctx.json({ success: true, message: 'Заказ успешно создан', paymentUrl: paymentUrl });
+    if (PAYMENT_METHOD_LIST.cryptoBot === methodPayment) {
+        const invoice = await createInvoiceCryptoBot({
+            amount: orderDto.amount,
+            currency: orderDto.currency,
+            orderId: order.id,
+            methodPayment,
+        });
+
+        return ctx.json({ success: true, message: 'Заказ успешно создан', paymentUrl: invoice.payUrl });
+    }
 });
 
 export { orders };
