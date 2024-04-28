@@ -40,7 +40,7 @@ export const createInvoiceCryptoBot = async (invoiceParams: InvoiceParams) => {
         asset: CryptoCurrency.TON,
         description: `Оплата заказа ${invoiceParams.orderId}`,
         paidBtnName: PaidBtnName.ViewItem,
-        paidBtnUrl: `https://example.com`,
+        paidBtnUrl: `http://localhost:5173?orderId=${invoiceParams.orderId}`,
         payload: {
             orderId: invoiceParams.orderId,
         },
