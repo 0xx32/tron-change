@@ -15,6 +15,7 @@ interface CreateOrderDto {
     currency: string;
     network: string;
     paymentAmount: number;
+    paymentMethod: PaymentMethodType;
 }
 
 interface CreateOrderResponse extends BaseResponse {
@@ -29,4 +30,17 @@ interface RateCurrency {
 }
 interface RateCurrencyResponse extends BaseResponse {
     rate: RateCurrency;
+}
+
+interface PaymentMethodsResponse {
+    methods: PaymentMethod[];
+}
+
+type PaymentMethodType = 'crypto-cloud' | 'crypto-bot';
+interface PaymentMethod {
+    id: number;
+    name: string;
+    logo: string;
+    type: 'crypto-cloud' | 'crypto-bot';
+    enabled: boolean;
 }

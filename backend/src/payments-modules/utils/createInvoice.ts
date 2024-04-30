@@ -7,7 +7,6 @@ interface InvoiceParams {
     amount: number;
     currency: string;
     orderId: number;
-    methodPayment: 'crypto-cloud' | 'crypto-bot';
 }
 
 export const createInvoiceCryptoCloud = async (invoiceParams: InvoiceParams) => {
@@ -37,7 +36,7 @@ export const createInvoiceCryptoCloud = async (invoiceParams: InvoiceParams) => 
 export const createInvoiceCryptoBot = async (invoiceParams: InvoiceParams) => {
     const invoice = await cryptoBotClient.createInvoice({
         amount: invoiceParams.amount,
-        asset: CryptoCurrency.TON,
+        asset: CryptoCurrency.USDT,
         description: `Оплата заказа ${invoiceParams.orderId}`,
         paidBtnName: PaidBtnName.ViewItem,
         paidBtnUrl: `http://localhost:5173?orderId=${invoiceParams.orderId}`,

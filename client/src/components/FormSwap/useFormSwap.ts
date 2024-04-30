@@ -10,8 +10,7 @@ import { createOrder } from '@/api/requests/orders';
 
 export const useFormSwap = ({ paymentAmount }: { paymentAmount: number }) => {
     const [paymentModalShow, setPaymentModalShow] = useState(false);
-
-    const [paymentLink, setPaymentLink] = useState('');
+    const [paymenMethodModalShow, setPaymentMethodModalShow] = useState(false);
 
     const form = useForm<FormSwapType>({
         resolver: valibotResolver(formSwapSchema),
@@ -25,22 +24,29 @@ export const useFormSwap = ({ paymentAmount }: { paymentAmount: number }) => {
         mutationKey: ['create-order'],
         mutationFn: (params: CreateOrderDto) => createOrder({ params }),
         onError(err: AxiosError<{ message: string }>) {
-            toast.error(err.response?.data.message, { description: 'Введите адрес кошелька TRX' });
+            toast.error(err.response?.data.message);
         },
         onSuccess({ data }: AxiosResponse<CreateOrderResponse>) {
             toast.success(data.message);
-            setPaymentModalShow(true);
-            setPaymentLink(data.paymentUrl);
+            setPaymentModalShow(false);
+            form.reset();
+            window.open(data.paymentUrl, '_blank');
         },
     });
 
-    const submitHandler: SubmitHandler<FormSwapType> = async (value) => {
-        await createOrderMutattion.mutateAsync({
-            address: value.address,
-            amount: +value['amount-trx'],
+    const submitHandler: SubmitHandler<FormSwapType> = async () => {
+        setPaymentMethodModalShow(true);
+    };
+
+    const createOrderHandler = (paymentMethod: PaymentMethodType) => {
+        const values = form.getValues();
+        createOrderMutattion.mutate({
+            address: values.address,
+            amount: +values['amount-trx'],
             paymentAmount: paymentAmount,
             currency: 'TRX',
             network: 'tron',
+            paymentMethod,
         });
     };
 
@@ -50,10 +56,16 @@ export const useFormSwap = ({ paymentAmount }: { paymentAmount: number }) => {
         mutatuion: {
             createOrderMutattion,
         },
+        functions: {
+            createOrderHandler,
+        },
         paymentModalState: {
-            paymentModalShow,
-            paymentLink,
-            setPaymentModalShow,
+            isShow: paymentModalShow,
+            setShow: setPaymentModalShow,
+        },
+        paymenMethodModaState: {
+            isShow: paymenMethodModalShow,
+            setShow: setPaymentMethodModalShow,
         },
     };
 };

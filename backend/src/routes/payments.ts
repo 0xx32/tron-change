@@ -1,10 +1,36 @@
 import { prisma } from 'database/db';
 import { Hono } from 'hono';
-import { CallbackResponse } from 'payments-modules/crypto-cloud/crypto-cloud.types';
-import { tronWeb } from 'tron-web/index';
+
 import * as jwt from 'jsonwebtoken';
 
 export const payments = new Hono();
+
+payments.get('/methods', async (ctx) => {
+    const methods = [
+        {
+            id: 1,
+            name: 'Крипто клауд',
+            logo: '/assets/images/crypto-cloud.svg',
+            type: 'crypto-cloud',
+            enabled: false,
+        },
+        {
+            id: 2,
+            name: 'Криптобот',
+            logo: '/assets/images/crypto-bot.jpg',
+            type: 'crypto-bot',
+            enabled: true,
+        },
+    ];
+
+    return ctx.json({ methods });
+});
+
+payments.post('/crypto-bot', async (ctx) => {
+    const body = await ctx.req.json()
+
+    console.log(ctx.req);
+});
 
 payments.post('/callback', async (ctx) => {
     try {
@@ -33,8 +59,6 @@ payments.post('/callback', async (ctx) => {
         });
 
         // tronWeb.trx.sendTransaction(order?.address, +order.amount);
-
-        console.log('Успех');
 
         return ctx.json({ success: true });
     } catch (error) {}

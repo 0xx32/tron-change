@@ -1,6 +1,6 @@
 import { FormSwap } from 'components/FormSwap';
 import { Layout } from 'components/layout';
-import { SuccessSreen } from 'components/SuccessSreen';
+import { SuccessSreen } from '@/components/SuccessScreen';
 
 
 export const App = () => {

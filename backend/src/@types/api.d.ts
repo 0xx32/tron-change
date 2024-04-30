@@ -14,3 +14,17 @@ interface CreateOrderDto {
     currency: string;
     network: string;
 }
+
+interface PaymentMethodResponse {
+    methods: PaymentMethod[];
+}
+
+
+
+interface PaymentMethod {
+    id: number;
+    name: string;
+    logo: string;
+    type: 'crypto-cloud' | 'crypto-bot';
+    enabled: boolean;
+}

@@ -1,15 +1,16 @@
 import { useEffect, useState } from 'react';
 import { NumericFormat } from 'react-number-format';
 
-import { Button } from 'components/ui/button';
-import { Input } from 'components/ui/input';
+import { Button, Input } from 'components/ui';
 import { useGetRate } from 'hooks/useGetRate';
 import { useFormSwap } from './useFormSwap';
-import { FormDialog } from '../FormDialog';
+import { PaymentMethodDialog } from '../PaymentMethodDialog';
 
 export const FormSwap = () => {
     const [paymentAmount, setPaymentAmount] = useState(0);
-    const { form, submitHandler, paymentModalState } = useFormSwap({ paymentAmount: paymentAmount });
+    const { form, submitHandler, paymenMethodModaState, functions } = useFormSwap({
+        paymentAmount: paymentAmount,
+    });
     const rateQuery = useGetRate({ currency: 'USD' });
     const amountTrx = form.watch('amount-trx');
 
@@ -72,10 +73,16 @@ export const FormSwap = () => {
                 </Button>
             </div>
 
-            <FormDialog
-                isVisible={paymentModalState.paymentModalShow}
-                setIsVisible={paymentModalState.setPaymentModalShow}
+            {/* <FormDialog
+                isVisible={paymentModalState.isShow}
+                setIsVisible={paymentModalState.setShow}
                 link={paymentModalState.paymentLink}
+            /> */}
+
+            <PaymentMethodDialog
+                isVisible={paymenMethodModaState.isShow}
+                setIsVisible={paymenMethodModaState.setShow}
+                onClick={functions.createOrderHandler}
             />
         </form>
     );

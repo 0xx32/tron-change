@@ -7,9 +7,10 @@ import { showRoutes } from 'hono/dev';
 
 import { prisma } from 'database/db';
 import { orders, rates, payments } from 'routes/index';
+import { serveStatic } from '@hono/node-server/serve-static';
 
 // init hono
-const app = new Hono().basePath('/api');
+const app = new Hono();
 
 // constants
 
@@ -17,11 +18,12 @@ const app = new Hono().basePath('/api');
 app.use('*', cors());
 app.use(logger());
 app.use(prettyJSON());
+app.use('static/*', serveStatic({ root: './' }));
 
 // routes
-app.route('orders', orders);
-app.route('rates', rates);
-app.route('payments', payments);
+app.route('api/orders', orders);
+app.route('api/rates', rates);
+app.route('api/payments', payments);
 
 const port = 4000;
 console.log(`Server is running on port ${port}`);

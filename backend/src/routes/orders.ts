@@ -3,7 +3,7 @@ import { vValidator } from '@hono/valibot-validator';
 
 import { prisma } from 'database/db';
 import { addressValidation } from 'tron-web/helpers/addressValidation';
-import { createOrderShema } from 'valibot/order.shemas';
+import { PaymentMethodTypes, createOrderShema } from 'valibot/order.shemas';
 
 import { PAYMENT_METHOD_LIST } from 'constants/payments';
 import { createInvoiceCryptoBot, createInvoiceCryptoCloud } from 'payments-modules/utils/createInvoice';
@@ -12,7 +12,6 @@ const orders = new Hono();
 
 orders.post('/', vValidator('json', createOrderShema), async (ctx) => {
     const orderDto = ctx.req.valid('json');
-    const methodPayment = 'crypto-bot';
 
     if (!orderDto.amount) {
         ctx.status(400);
@@ -37,25 +36,23 @@ orders.post('/', vValidator('json', createOrderShema), async (ctx) => {
         },
     });
 
-    if (PAYMENT_METHOD_LIST.cryptoCloud === methodPayment) {
+    if (PaymentMethodTypes.cryptoCloud === orderDto.paymentMethod) {
         const invoice = await createInvoiceCryptoCloud({
             amount: orderDto.paymentAmount,
             currency: orderDto.currency,
             orderId: order.id,
-            methodPayment,
         });
 
         return ctx.json({ success: true, message: 'Заказ успешно создан', paymentUrl: invoice.result.link });
     }
 
-    if (PAYMENT_METHOD_LIST.cryptoBot === methodPayment) {
+    if (PaymentMethodTypes.cryptoBot === orderDto.paymentMethod) {
         console.log(orderDto);
 
         const invoice = await createInvoiceCryptoBot({
             amount: orderDto.paymentAmount,
             currency: orderDto.currency,
             orderId: order.id,
-            methodPayment,
         });
 
         return ctx.json({ success: true, message: 'Заказ успешно создан', paymentUrl: invoice.payUrl });

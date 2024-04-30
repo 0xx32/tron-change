@@ -7,9 +7,9 @@ interface FormDialogProps {
     setIsVisible: (isVisible: boolean) => void;
 }
 
-export const FormDialog = ({ link, isVisible }: FormDialogProps) => {
+export const FormDialog = ({ link, isVisible, setIsVisible }: FormDialogProps) => {
     return (
-        <Dialog open={isVisible}>
+        <Dialog open={isVisible} onOpenChange={setIsVisible}>
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle className="mb-4">Перейти к оплате</DialogTitle>
